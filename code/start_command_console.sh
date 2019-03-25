@@ -8,7 +8,7 @@ source ./constants.conf
 # Show the ILITE Screen saver (in the background) until other stuff happens
 python3 display_ilite_logo.py &
 
-# TODO:- Change background IMAGE to Outreach video (booklet)
+# TODO: Change background IMAGE to Outreach video (booklet)
 
 # Run the button reader
 python3 main.py

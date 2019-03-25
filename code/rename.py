@@ -1,6 +1,6 @@
 #
 #   PDFs take too long to load on the RPi. Instead I am using an image viewer
-#   on a folder of images for each slide; this loads WAY quicker.
+#   on a folder of images for each powerpoint; this loads WAY quicker.
 #   Powerpoint needs to be exported to a folder of PNGs which is done easy
 #   enough however, the files need to be renamed from "Slide1' "Slide2" to
 #   "01" "02"... "11"... so linux shows pictures in order in the slide show.

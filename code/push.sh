@@ -14,7 +14,7 @@ then
 						export DISPLAY=:0;
 						./start_command_console.sh'
 
-# Else, go through the options loop
+# Else, (arguments are given) go through the options loop
 else
 	while getopts ":prm" opt; do
 		case ${opt} in

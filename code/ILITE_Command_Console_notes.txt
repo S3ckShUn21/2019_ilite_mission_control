@@ -1,27 +1,2 @@
-1) The command for killing the vlc program is "kill $(ps -e | grep vlc | cut -f1 -d' ')"
-	-> This basically kills the pid ( cut field #1 with the delimiter of space ) returned by every process (ps -e) BUT only the vlc process running (grep vlc)
-
-
-2) The python screenshot display program
-	-> Need to install the following imports :
-		tkinter: sudo apt-get install python-tk
-
-ssh -t Cole@10.11.0.190 'cd Desktop/videos; python gpio_test.py'
-
-
-"EVINCE" may be a better PDF viewer than the xpdf that comes with raspbian
-
-
-wpa_supplicant.conf
-
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-
-network={
-    ssid="Karyn&Cole"
-    psk="K@riN&C013"
-    key_mgmt=WPA-PSK
-}
-
 password for the RPi is ilite1885
 hostname for RPi is ilite_mission_control
