@@ -6,9 +6,9 @@ import subprocess
 last_button_pressed = -1
 switch_state = -1
 
-# Dictionary of all of the media filenames
+# Dictionary of all of the media filenames or fodler names
 media = {
-    "outreach": ["outreach.pdf", "outreach.mp4"],
+    "outreach": ["Outreach 2019 V7 Renammed", "outreach.mp4"],
     "build": ["build", "build"],
     "graphics": ["graphics", "graphics"],
     "website": ["website", "website"],

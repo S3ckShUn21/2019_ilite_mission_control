@@ -16,11 +16,17 @@ To start the whole project off I use the shell command
 
 ## Other Info
 * Most, if not all files have a description at the top of the file for more information
-* The wpa_supplicant is just a file to add into the boot partition to get the Pi to auto connect to wifi without needing a mouse or keyboard - not needed for normal operations
+* Because python is so slow compared to pure bash, I try as much as possible to run processes in shell scripts
 * The ILITE_Comm...notes are sporadic random additions that may or may not be kept around
 * The depreciated folder will probably be deleted soon, now that I'm using Git
+* The Outreach powerpoint and related folders are there to show what the difference is in the naming scheme
+    * The one that would be used is the "renammed" one
+    * There won't actually be two folers in production; just the one with the same exact name as the powerpoint
 
 ## Linux Dependencies
+* python3
+    * tkinter : a window creation python library used to display the ilite logo
+* The default image viewer for raspberry pi
 * xdotool : a terminal program to simulate key strokes
     * This is used for left and right during the slide show
 * VLC media player for the videos

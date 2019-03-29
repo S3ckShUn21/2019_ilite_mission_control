@@ -17,7 +17,7 @@ if len(sys.argv) < 2:
     print("No need to think about relative path to the file")
     sys.exit(-1)
 
-path = "/home/ilite/Mission_Control_2019_files/media"
+path = "/home/ilite/Mission_Control_2019_files/media/"
 path = path + sys.argv[1]
 files = sorted(os.listdir(path))
 
