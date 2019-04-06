@@ -43,6 +43,7 @@ class LEDMatrix():
     # Figure out the pin numbers to drive high/low
     # Turn the led on ON A DIFFERENT THREAD because it will be on for a set amount of time
     # We don't want it impeading the timer of the 
+    # time on is seconds for the light to stay on
     def driveLED(self, ledName, timeOn=0.25):
         # Coordinate x y of the led name
         coord = self._name_index[ledName]
@@ -87,44 +88,42 @@ media = {
 
 # These are the values that will output to the callback function whenever the buttons are pressed
 keypad_vals = [
-    ["outreach", "build", "3d_print", "programming"],
-    ["graphics", "website", "playbook", "electronics"],
-    ["steam_expo", "summer_camp_vid", "left", "right"],
-    ["vision_pathfollowing", "bellypan_pneumatics", "hosting_comps", "team_history"],
-    ["dt_intake", "elevator", "climber", "flower_cargoshooter"]
+    ["outreach", "build", "steam_expo", "summer_camp_vid", "vision_pathfollowing"],
+    ["bellypan_pneumatics","graphics","website","playbook","electronics"],
+    ["dt_intake","elevator","climber","flower_cargoshooter","3d_print"],
+    ["programming","left","right","hosting_comps","team_history"]
 ]
 # There are 4
 # The library sets the columns as outputs
 # I am following the schematic of Mr. Luban's for reference
-keypad_cols_pins = [36, 37, 38, 40]
+keypad_cols_pins = [5, 7, 11, 13, 15]
 # There are 5
 # The library sets the rows as inputs
 # I am following the schematic of Mr. Luban's for reference
-keypad_rows_pins = [5, 7, 11, 13, 15]
+keypad_rows_pins = [36, 37, 38, 40] 
 
-# An object the library needs to create other keypads
-keypad_creator = KEY.KeypadFactory()
+# These are connected to the emitter of the transistor (active LOW)
+led_matrix_cols_pins = [18,22,24,26,32]
+# These are connected to the base of the transistor (active HIGH)
+led_matrix_rows_pins = [8,10,12,16]
 
-# The keypad object that gets setup later
-keypad = None
-
-# Thread that handles turning on buttons
-LED_thread = Thread()
+# The button_keypad object that gets setup later
+button_keypad = None
 
 # LED Matrix object that gets setup later
 LED_matrix = None
 
 # These are functional pins that don't have media attached to them
 # TODO: Change these to the correct pin vals
-switch_read_pin = -1
-end_program_pin = -1
+switch_read_pin = 31
+end_program_pin = 29
 
 # Time in ms
 pin_debounce_time = 42
 
 # Functions
 def my_callback(pin_name):
-    global last_button_pressed, switch_read_pin, media, LED_thread, LED_matrix
+    global last_button_pressed, switch_read_pin, media, LED_matrix
 
     if last_button_pressed != pin_name:
 
@@ -133,8 +132,9 @@ def my_callback(pin_name):
         elif pin_name == "right":
             subprocess.call("xdotool key Right")
         else:
-            # Start a thread to turn on the LED of the button for a short time
-            Thread( target=LED_matrix.driveLED, args=(pin_name))
+            # Start a thread to turn on the LED of the button that was just pressed for a short time
+            Thread( target=LED_matrix.driveLED, args=(pin_name)).start()
+
             # Read switch to determine which media to play
             # This will either be 0 or 1
             switch_state = GPIO.input(switch_read_pin)
@@ -148,16 +148,17 @@ def my_callback(pin_name):
             last_button_pressed = pin_name
 
 
-# This creates the keypad and then sets up the switch read and end program
+# This creates the button_keypad and then sets up the switch read and end program
 def setup_pins():
-    global keypad, LED_matrix
-    # Creating the actual keypad
-    keypad = keypad_creator.create_keypad(
-        keypad=keypad_vals, row_pins=keypad_rows_pins, col_pins=keypad_cols_pins, gpio_mode=GPIO.BOARD)
+    global button_keypad, LED_matrix
+    # Creating the actual button_keypad
+    button_keypad = KEY.KeypadFactory().create_keypad(
+        button_keypad=keypad_vals, row_pins=keypad_rows_pins, col_pins=keypad_cols_pins, gpio_mode=GPIO.BOARD)
 
     # Apply the callback function to whenever any of the keys are pressed
-    keypad.registerKeyPressHandler(my_callback)
+    button_keypad.registerKeyPressHandler(my_callback)
 
+    # Setup the matrix that will handle the turning on the LEDs 
     LED_matrix = LEDMatrix(keypad_vals, keypad_rows_pins, keypad_cols_pins)
 
     # TODO: setup the end_program and switch_read GPIOs
@@ -173,7 +174,5 @@ if __name__ == "__main__":
     # This just has the program run until the 'END' button is pressed
     # That button will be inside the control pannel, away from prying eyes
     GPIO.wait_for_edge(end_program_pin, GPIO.RISING)
-
-    LEDThread.join()
 
     print("Ending the Main loop")
