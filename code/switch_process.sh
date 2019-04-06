@@ -10,27 +10,6 @@ source ./constants.conf
 # Functions
 # ---------
 
-# Kill the running video or current slideshow
-# grep returns a 0 if there is a match found
-kill_the_things () {
-    running_processes = ps -e
-
-    $running_processes | grep vlc
-    vlc_running = $?
-    $running_processes | grep gpicview
-    gpic_running = $?
-
-    if [ vlc_running == 0 ]
-    then
-        echo "Killing all vlc"
-        killall vlc
-    elif [ gpic_running == 0 ]
-    then
-        echo "Killing all gpicview"
-        killall gpicview
-    fi
-}
-
 # Grab the file extension of the given file to then decide which command to use
 # If there is no file extension (meaning it is a folder) then cut returns the
 # the whole file name -> which will never equal mp4
@@ -62,13 +41,13 @@ is_mp4
 if [ is_mp4 "$1" ]
 then
     echo "Video Starting"
-    kill_the_things
-    vlc -f --no-video-title-show --mouse-hide-timeout 0 $OPTARG &
+    killall vlc gpicview
+    vlc -f --no-video-title-show --mouse-hide-timeout 0 --play-and-exit $OPTARG &
     exit 0
 else
     echo "Slideshow starting"
-    kill_the_things 
-    # open the image
+    killall vlc gpicview
+    # open the image folder
     gpicview $OPTARG
     # make full screen
     xdotool key F11
