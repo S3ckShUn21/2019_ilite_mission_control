@@ -1,68 +1,7 @@
 import RPi.GPIO as GPIO
-import keypad_matrix as KEY
-from threading import Thread
+import code.matricies as Matrix
 import time
 import subprocess
-
-# This will be the object that controls turning the lights on
-# The pad4pi library can only read ; this object will drive the leds when we want
-
-
-class LEDMatrix():
-    def __init__(self, keys, row_pins, col_pins, gpio_mode=GPIO.BOARD):
-        self._keys = keys
-        self._row_pins = row_pins
-        self._col_pins = col_pins
-        self._gpio_mode = gpio_mode
-        self._name_index = {}
-
-        # Searching through the array everytime is really slow
-        # This creates a hashmap basically for what led row and col to turn on
-        self._setupNameIndex()
-
-        # Set the matrix pins as outputs
-        self._setupPins()
-
-    def _setupNameIndex(self):
-        # Num rows
-        for i in range(len(self._keys)):
-            # Num cols
-            for j in range(len(self._keys[0])):
-                # Adds a dictionary entry with the coordinate of the value
-                self._name_index[self._keys[i][j]] = (i, j)
-
-    def _setupPins(self):
-        # Setup all of the pins as outputs
-        GPIO.setmode(self._gpio_mode)
-        # First do the columns; they will be driven low, therefore they have a pullUP resistor
-        for pin in self._col_pins:
-            print("Turning on pin " + str(pin))
-            GPIO.setup(pin, GPIO.OUT)
-
-        # Second do the rows; rows will be driven high, therefore 'normal mode' is pullDOWN
-        for pin in self._row_pins:
-            print("Turning on pin " + str(pin))
-            GPIO.setup(pin, GPIO.OUT)
-
-    # Figure out the pin numbers to drive high/low
-    # Turn the led on ON A DIFFERENT THREAD because it will be on for a set amount of time
-    # We don't want it impeading the timer of the
-    # time on is seconds for the light to stay on
-    def driveLED(self, ledName, timeOn=5):
-        # Coordinate x y of the led name
-        coord = self._name_index[ledName]
-        # Cols are Y value
-        col_pin = self._col_pins[coord[1]]
-        # Cols are driven low
-        GPIO.ouput(col_pin, GPIO.LOW)
-        row_pin = self._row_pins[coord[0]]
-        # Rows are dirven high
-        GPIO.output(row_pin, GPIO.HIGH)
-        time.sleep(timeOn)
-        # Switch LED back to off position
-        GPIO.output(col_pin, GPIO.HIGH)
-        GPIO.output(row_pin, GPIO.LOW)
-
 
 # Global Vars
 last_button_pressed = "None"
@@ -157,29 +96,27 @@ def button_pressed_callback(pin_name):
     #         # Makes itso you cant mash the same button while its already running
     #         last_button_pressed = pin_name
     #  Thread(target=LED_matrix.driveLED, args=(pin_name)).start()
-    print(pin_name)
+    print("Button callback says: " + pin_name)
 
 
 # This creates the button_keypad and then sets up the switch read and end program
 def setup_pins():
-    global button_keypad, LED_matrix, switch_read_pin, end_program_pin
-    # Creating the actual button_keypad
-    button_keypad = KEY.KeypadFactory().create_keypad(
-        keypad=keypad_vals, row_pins=keypad_rows_pins, col_pins=keypad_cols_pins)
+    global button_keypad, LED_matrix, switch_read_pin, end_program_pin, keypad_rows_pins, keypad_cols_pins, led_matrix_rows_pins, led_matrix_cols_pins
 
-    # Apply the callback function to whenever any of the keys are pressed
-    button_keypad.registerKeyPressHandler(button_pressed_callback)
+    # Creating the actual button_keypad
+    button_keypad = Matrix.ButtonMatrix(
+        keys=keypad_vals, row_pins=keypad_rows_pins, col_pins=keypad_cols_pins, callback_function=button_pressed_callback)
 
     # Setup the matrix that will handle the turning on the LEDs
-    LED_matrix = LEDMatrix(keypad_vals, keypad_rows_pins, keypad_cols_pins)
-
-    GPIO.setmode(GPIO.BOARD)
+    LED_matrix = LEDMatrix(
+        keypad_vals, led_matrix_rows_pins, led_matrix_cols_pins)
 
     # The pin the reads the switch state; it is SPDT and one way pulls low the other pulls high
     GPIO.setup(switch_read_pin, GPIO.IN)
     # The kill switch button (active HIGH)
-    print('Setup end_program_pin')
     GPIO.setup(end_program_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+    print("Pin setup complete")
 
 # Main
 # This program works on callback functions whenever a button is pressed
