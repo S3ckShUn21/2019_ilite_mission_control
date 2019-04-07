@@ -8,7 +8,7 @@ source ./constants.conf
 
 # ---------
 # Functions
-# ---------
+# --------- 
 
 # Grab the file extension of the given file to then decide which command to use
 # If there is no file extension (meaning it is a folder) then cut returns the
