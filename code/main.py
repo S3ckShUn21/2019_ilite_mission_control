@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import code.matricies as Matrix
+import matricies as Matrix
 import time
 import subprocess
 
@@ -70,7 +70,7 @@ pin_debounce_time = 42
 
 
 def button_pressed_callback(pin_name):
-    # global last_button_pressed, switch_read_pin, media, LED_matrix, allowed_time_between_button_presses
+    global last_button_pressed, switch_read_pin, media, LED_matrix, allowed_time_between_button_presses
 
     # time_last_button_pressed = time.time()
 
@@ -97,6 +97,7 @@ def button_pressed_callback(pin_name):
     #         last_button_pressed = pin_name
     #  Thread(target=LED_matrix.driveLED, args=(pin_name)).start()
     print("Button callback says: " + pin_name)
+    LED_matrix.driveLED( pin_name )
 
 
 # This creates the button_keypad and then sets up the switch read and end program
@@ -108,7 +109,7 @@ def setup_pins():
         keys=keypad_vals, row_pins=keypad_rows_pins, col_pins=keypad_cols_pins, callback_function=button_pressed_callback)
 
     # Setup the matrix that will handle the turning on the LEDs
-    LED_matrix = LEDMatrix(
+    LED_matrix = Matrix.LEDMatrix(
         keypad_vals, led_matrix_rows_pins, led_matrix_cols_pins)
 
     # The pin the reads the switch state; it is SPDT and one way pulls low the other pulls high
@@ -135,5 +136,5 @@ if __name__ == "__main__":
 
     print("Ending the Main loop")
 
-    button_keypad.cleanup()
+    button_keypad.cleanupMatrix()
     GPIO.cleanup()

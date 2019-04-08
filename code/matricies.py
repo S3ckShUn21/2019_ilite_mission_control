@@ -47,9 +47,10 @@ class LEDMatrix():
         coord = self._name_index[ledName]
         # Cols are Y value
         col_pin = self._col_pins[coord[1]]
-        # Cols are driven low
-        GPIO.ouput(col_pin, GPIO.LOW)
         row_pin = self._row_pins[coord[0]]
+        print("Lighting row = " + str(row_pin) + "col = " + str(col_pin))
+        # Cols are driven low
+        GPIO.output(col_pin, GPIO.LOW)
         # Rows are dirven high
         GPIO.output(row_pin, GPIO.HIGH)
         time.sleep(timeOn)
@@ -116,10 +117,11 @@ class ButtonMatrix():
             for row in self._row_pins:
                 GPIO.output(row, GPIO.HIGH)
                 # Check for which column is powered
-                for col in slef._col_pins:
+                for col in self._col_pins:
                     if GPIO.input(col) == GPIO.HIGH:
                         # If a button is powered then pass the button name to the callback function
                         self._callback_function(self._name_index[(row,col)])
+                GPIO.output(row, GPIO.LOW)
             # Poll 20 times per second
             time.sleep(0.050)
 
