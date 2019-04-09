@@ -80,8 +80,10 @@ class LEDMatrixCycle():
                     self._flashLED(led, self._onPeriod)
 
                     # Now check to see if this LED has timed out
-                    if time.time() > led['offTime']:
-                        led['onFlag'] = False
+                    if led['offTime']:
+                        if time.time() > led['offTime']:
+                            led['onFlag'] = False
+                            led['offTime'] = None
 
             if not onFlag:
                 # Make sure we sleep at least once per cycle
