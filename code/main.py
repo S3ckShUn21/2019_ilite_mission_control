@@ -97,20 +97,35 @@ def button_pressed_callback(pin_name):
     #         last_button_pressed = pin_name
     #  Thread(target=LED_matrix.driveLED, args=(pin_name)).start()
     print("Button callback says: " + pin_name)
-    LED_matrix.driveLED( pin_name )
+    # LED_matrix.driveLED( pin_name )
+
+    # TESTING:
+    # Test with LED on for 10 seconds, multiple LEDs should be handled correctly,
+    # though the brightness will dim as more LEDs are added
+    LED_matrix.ledOn( pin_name, 10.0 )
 
 
 # This creates the button_keypad and then sets up the switch read and end program
 def setup_pins():
     global button_keypad, LED_matrix, switch_read_pin, end_program_pin, keypad_rows_pins, keypad_cols_pins, led_matrix_rows_pins, led_matrix_cols_pins
 
+    # Setup the matrix that will handle the turning on the LEDs
+    # LED_matrix = Matrix.LEDMatrix(
+    #    keypad_vals, led_matrix_rows_pins, led_matrix_cols_pins)
+
+    # TESTING:
+    # This is to test the LED cycle matrix
+    LED_matrix = Matrix.LEDMatrixCycle(
+        keypad_vals, led_matrix_rows_pins, led_matrix_cols_pins)
+    LED_matrix.start()
+
+    # JMS: Moved this to after the LED Matrix is created to avoid possible race 
+    # condition of button being pressed and button_pressed_callback being called
+    # before the LED Matrix was created.
     # Creating the actual button_keypad
     button_keypad = Matrix.ButtonMatrix(
         keys=keypad_vals, row_pins=keypad_rows_pins, col_pins=keypad_cols_pins, callback_function=button_pressed_callback)
 
-    # Setup the matrix that will handle the turning on the LEDs
-    LED_matrix = Matrix.LEDMatrix(
-        keypad_vals, led_matrix_rows_pins, led_matrix_cols_pins)
 
     # The pin the reads the switch state; it is SPDT and one way pulls low the other pulls high
     GPIO.setup(switch_read_pin, GPIO.IN)
@@ -135,6 +150,9 @@ if __name__ == "__main__":
     GPIO.wait_for_edge(end_program_pin, GPIO.RISING)
 
     print("Ending the Main loop")
+
+    # TESTING:
+    LED_matrix.stop()
 
     button_keypad.cleanupMatrix()
     GPIO.cleanup()
